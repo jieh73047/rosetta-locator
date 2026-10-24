@@ -1,0 +1,33 @@
+{
+  "id": "./",
+  "name": "罗塞塔石碑希腊文拼片定位器",
+  "short_name": "罗塞塔定位器",
+  "description": "输入连续的希腊字母，定位罗塞塔石碑拼片所在位置。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f2f0e8",
+  "theme_color": "#f2f0e8",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

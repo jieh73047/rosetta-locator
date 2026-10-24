@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="根据至少四个连续希腊字母定位罗塞塔石碑希腊文拼片">
+  <meta name="theme-color" content="#f2f0e8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="罗塞塔定位器">
+  <title>罗塞塔 · 希腊文拼片定位器</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <div class="hero-topline">
+        <div class="eyebrow">ROSETTA · GREEK LOCATOR</div>
+        <button id="install-button" class="install-button" type="button" hidden>安装到平板</button>
+      </div>
+      <h1>让一串字母，<span>回到石碑上。</span></h1>
+      <p>输入拼片上横向连续的至少四个希腊字母，字母越多，定位越精确。</p>
+    </header>
+
+    <section id="workspace" class="workspace is-empty" aria-live="polite">
+      <div class="visual-panel">
+        <div class="panel-heading">
+          <h2>石碑位置</h2>
+          <label class="upload-button">
+            <input id="image-upload" type="file" accept="image/*">
+            <span>上传参考图</span>
+          </label>
+        </div>
+
+        <div id="stone-stage" class="stone-stage">
+          <div id="stone-placeholder" class="stone-placeholder" aria-label="罗塞塔石碑位置示意图">
+            <div class="broken-top"></div>
+            <div class="script-zone hieroglyph-zone"><span>圣书体</span></div>
+            <div class="script-zone demotic-zone"><span>世俗体</span></div>
+            <div id="greek-zone" class="script-zone greek-zone"><span>希腊文 · 54 行</span></div>
+          </div>
+          <img id="reference-image" alt="用户上传的罗塞塔石碑参考图">
+          <div id="highlight-layer" class="highlight-layer"></div>
+          <div class="empty-prompt" id="empty-prompt">
+            <span class="prompt-glyph">Α</span>
+            <p>输入至少四个字母后，这里会标出位置</p>
+          </div>
+        </div>
+
+        <details class="calibration" id="calibration">
+          <summary>校准上传图片中的希腊文区域</summary>
+          <p>数值是希腊文区域相对整张图片的百分比。默认值适合完整石碑正面图。</p>
+          <div class="calibration-grid">
+            <label>左边界 <input id="cal-x" type="number" min="0" max="100" step="0.1" value="9"></label>
+            <label>上边界 <input id="cal-y" type="number" min="0" max="100" step="0.1" value="58"></label>
+            <label>宽度 <input id="cal-w" type="number" min="1" max="100" step="0.1" value="82"></label>
+            <label>高度 <input id="cal-h" type="number" min="1" max="100" step="0.1" value="38"></label>
+          </div>
+        </details>
+      </div>
+
+      <aside class="side-panel">
+        <section class="search-panel" aria-labelledby="search-title">
+          <h2 id="search-title">输入字母</h2>
+          <form id="search-form" novalidate>
+            <div class="search-row">
+              <label class="search-box" for="query">
+                <span class="sr-only">至少四个希腊字母</span>
+                <input id="query" name="query" type="text" inputmode="text"
+                       autocomplete="off" autocapitalize="characters" spellcheck="false"
+                       placeholder="ΒΑΣΙ…" aria-describedby="query-hint">
+                <span id="letter-count" class="letter-count">0 个字母</span>
+              </label>
+              <button class="primary-button" type="submit">定位 <span aria-hidden="true">→</span></button>
+            </div>
+            <p id="query-hint" class="hint">至少四个连续字母；自动忽略空格、标点和重音。</p>
+            <div id="keyboard" class="greek-keyboard" aria-label="希腊字母键盘"></div>
+          </form>
+          <div id="message" class="message" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="results-panel" aria-labelledby="results-title">
+          <div class="panel-heading compact">
+            <h2 id="results-title">核对上下文</h2>
+            <span id="result-count" class="result-count">0 处</span>
+          </div>
+          <div id="results" class="results-list">
+            <div class="results-empty">
+              <p>等待输入</p>
+              <span>找到结果后，将显示原文上下文与精确行列。</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="text-panel">
+      <details>
+        <summary>
+          <span><b>完整希腊文转录</b><small>点击展开，可直接浏览 54 行原文</small></span>
+          <span aria-hidden="true">＋</span>
+        </summary>
+        <div class="transcript-tools">
+          <label class="toggle"><input id="compact-text" type="checkbox"><span>隐藏词间空格</span></label>
+          <span>
+            <label class="text-button file-button">导入逐行 .txt<input id="text-upload" type="file" accept=".txt,text/plain"></label>
+            <button id="reset-text" class="text-button" type="button">恢复内置转录</button>
+          </span>
+        </div>
+        <ol id="transcript" class="transcript"></ol>
+      </details>
+    </section>
+
+    <footer>
+      <p>转录来源：希腊语维基文库《Στήλη της Ροζέττας》；残缺与复原字符以方括号表示。</p>
+      <p>所有搜索均在你的浏览器中完成，上传的图片不会离开本机。</p>
+    </footer>
+  </main>
+
+  <dialog id="install-dialog" class="install-dialog">
+    <form method="dialog">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">INSTALL</span>
+          <h2>安装到平板主屏幕</h2>
+        </div>
+        <button class="dialog-close" value="close" aria-label="关闭">×</button>
+      </div>
+      <div class="install-instructions">
+        <div><b>iPad · Safari</b><span>点击浏览器的“分享”按钮，再选择“添加到主屏幕”。</span></div>
+        <div><b>Android · Chrome</b><span>打开浏览器菜单，选择“安装应用”或“添加到主屏幕”。</span></div>
+      </div>
+      <p>安装后可像普通 App 一样全屏启动；首次完整打开后也可离线使用。</p>
+    </form>
+  </dialog>
+
+  <script src="rosetta-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
